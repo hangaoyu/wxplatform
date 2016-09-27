@@ -15,7 +15,7 @@ class JsapiTicketRepository extends CommonRepository
 {
     public function getLast()
     {
-        $tikcet = $this->model->where('expires', '>', date('Y-m-d H:i:s', time() - 200 ) )
+        $tikcet = $this->model->where('expires', '>', date('Y-m-d H:i:s', time() - 60*10 ) )
             ->orderBy('id', 'desc')
             ->Limit(1)
             ->first();
