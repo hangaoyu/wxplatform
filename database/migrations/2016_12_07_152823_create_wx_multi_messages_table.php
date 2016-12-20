@@ -16,7 +16,7 @@ class CreateWxMultiMessagesTable extends Migration
             $table->increments('id');
             $table->timestamps();
             $table->integer('message_id')->unsigned();
-            $table->foreign('message_id')->references('id')->on('messages')->onDelete('cascade');
+            $table->foreign('message_id')->references('id')->on('wx_messages')->onDelete('cascade');
             $table->text('title')->comment('回复文本内容');
             $table->text('description')->comment('回复文本描述');
             $table->string('image')->comment('回复图片');
