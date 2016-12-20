@@ -1,5 +1,6 @@
 <?php
 Route::get('/', function () {
+
     return redirect('backend/index/');
 });
 
@@ -29,4 +30,13 @@ Route::group([
     'middleware' => ['apiAuthenticate'],
 ], function () {
     require_once __DIR__ . '/Routes/api.php';
+});
+
+/* 微信处理 */
+Route::group([
+  
+    'namespace'  => 'Wechat',
+
+], function () {
+    require_once __DIR__ . '/Routes/wechat.php';
 });
