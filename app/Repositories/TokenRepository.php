@@ -14,7 +14,7 @@ class TokenRepository extends CommonRepository
 
     public function getLast()
     {
-        $token = $this->model->where('expires', '>', date('Y-m-d H:i:s', time() - 200 ) )
+        $token = $this->model->where('expires', '>', date('Y-m-d H:i:s', time() - 60*10 ) )
             ->orderBy('id', 'desc')
             ->Limit(1)
             ->first();
