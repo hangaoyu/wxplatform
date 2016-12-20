@@ -80,34 +80,37 @@ class WxMessageRepository extends CommonRepository
     {
         $user_message_name = $user_message->Content;
         $message = Message::where('message_name', $user_message_name)->first();
-        switch ($message->return_id) {
-            case 1:
-                return $message->description;
-            case 2:
-                $news = new News([
-                    'title' => $message->title,
-                    'description' => $message->description,
-                    'url' => $message->content_url,
-//                    'image' => $message->image,
-                    // ...
-                ]);
-
-                return $news;
-            case 3:
-                $mulitnews = [];
-                $mulitmessages = $message->mulitmessage;
-                foreach ($mulitmessages as $key => $message) {
+        if ($message){
+            switch ($message->return_id) {
+                case 1:
+                    return $message->description;
+                case 2:
                     $news = new News([
                         'title' => $message->title,
                         'description' => $message->description,
                         'url' => $message->content_url,
+                        'image' => $message->image,
+                        // ...
+                    ]);
+
+                    return $news;
+                case 3:
+                    $mulitnews = [];
+                    $mulitmessages = $message->mulitmessage;
+                    foreach ($mulitmessages as $key => $message) {
+                        $news = new News([
+                            'title' => $message->title,
+                            'description' => $message->description,
+                            'url' => $message->content_url,
 //                        'image' => $message->image,
 
-                    ]);
-                    array_push($mulitnews, $news);
-                }
-                return $mulitnews;
+                        ]);
+                        array_push($mulitnews, $news);
+                    }
+                    return $mulitnews;
+            }
         }
+
 
     }
 
