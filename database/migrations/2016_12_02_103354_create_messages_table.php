@@ -12,7 +12,7 @@ class CreateMessagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('messages', function (Blueprint $table) {
+        Schema::create('wx_messages', function (Blueprint $table) {
             $table->increments('id');
             $table->string('message_name')->comment("用户消息内容")->unique();
             $table->integer('type_id')->comment('消息类型,1->文本,2->图片');
