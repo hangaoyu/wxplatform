@@ -98,9 +98,9 @@ class WechatController extends Controller
         $wechat = app('wechat');
         $menu = $wechat->menu;
         $menu->destroy();
-        $mainButtons = WxMenu::where('level', 1)->get();
+        $mainButtons = WxMenu::where('level', 1)->orderBy('order','DESC')->get();
         $buttons = collect($mainButtons)->map(function ($mainButton) {
-            $submenu = WxMenu::where('level_id', $mainButton->id)->get();
+            $submenu = WxMenu::where('level_id', $mainButton->id)->orderBy('order','DESC')->get();
             if (count($submenu) > 0) {
                 $subbuttons = collect($submenu)->map(function ($subbutton) {
                     return ['type' => $subbutton->type, 'name' => $subbutton->name, 'url' => $subbutton->url];
