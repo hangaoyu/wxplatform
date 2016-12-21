@@ -118,7 +118,7 @@ class WechatController extends Controller
 
         if ($buttons) {
             try {
-                $res = $menu->add($buttons);
+                $menu->add($buttons);
                 return 'menu update';
             } catch (\Exception $e) {
                 return (['result' => $e->getMessage()]);
