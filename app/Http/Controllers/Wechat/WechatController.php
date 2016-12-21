@@ -99,7 +99,6 @@ class WechatController extends Controller
         $menu = $wechat->menu;
         $menu->destroy();
         $mainButtons = WxMenu::where('level', 1)->get();
-
         $buttons = collect($mainButtons)->map(function ($mainButton) {
             $submenu = WxMenu::where('level_id', $mainButton->id)->get();
             if (count($submenu) > 0) {
@@ -118,9 +117,18 @@ class WechatController extends Controller
         })->toArray();
 
         if ($buttons) {
-            $menu->add($buttons);
+            $res = $menu->add($buttons);
+            if ($res){
+                return 'menu update';
+            }else{
+
+                return response('update fail',404);
+            }
+
+        }else{
+            return response('not found menu in database',404);
+
         }
-        return 'menu update';
 
 
     }
