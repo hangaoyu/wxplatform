@@ -117,19 +117,13 @@ class WechatController extends Controller
         })->toArray();
 
         if ($buttons) {
-            $res = $menu->add($buttons);
-            if ($res){
+            try {
+                $menu->add($buttons);
                 return 'menu update';
-            }else{
-
-                return response('update fail',404);
+            } catch (\Exception $e) {
+                return (['result' => $e->getMessage()]);
             }
-
-        }else{
-            return response('not found menu in database',404);
-
         }
-
 
     }
 
