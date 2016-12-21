@@ -58,19 +58,25 @@ class WxMessageRepository extends CommonRepository
         }
         try {
             $event = Event::where('event_name', $event_name)->first();
-            switch ($event->return_id) {
-                case 1:
-                    return $event->description;
-                case 2:
-                    $news = new News([
-                        'title' => $event->title,
-                        'description' => $event->description,
-//                        'url' => $event->content_url,
-                        'image' => $event->image,
-                        // ...
-                    ]);
-                    return $news;
+            if (!$event){
+                return '';
             }
+            else{
+                switch ($event->return_id) {
+                    case 1:
+                        return $event->description;
+                    case 2:
+                        $news = new News([
+                            'title' => $event->title,
+                            'description' => $event->description,
+//                        'url' => $event->content_url,
+                            'image' => $event->image,
+                            // ...
+                        ]);
+                        return $news;
+                }
+            }
+
         } catch (\Exception $e) {
             return $e->getMessage();
         }
