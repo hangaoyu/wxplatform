@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+
 use App\Repositories\JsapiTicketRepository;
 use App\Repositories\TokenRepository;
 use App\Repositories\UserRepository;
@@ -9,6 +10,8 @@ use App\Repositories\MenuRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\ActionRepository;
 use App\Repositories\PermissionRepository;
+use App\Repositories\WxMessageRepository;
+use App\Repositories\WxTemplateRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -39,6 +42,25 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->registerRoleRepository();
         $this->registerActionRepository();
         $this->registerPermissionRepository();
+        $this->registerWechatRepository();
+    }
+
+    public function registerWechatRepository()
+    {
+        $this->app->singleton('wxmessagerepository', function ($app) {
+            $model = config('repository.models.wxmessage');
+            $message = new $model();
+            $validator = $app['validator'];
+
+            return new WxMessageRepository($message, $validator);
+        });
+        $this->app->singleton('wxtemplaterepository', function ($app) {
+            $model = config('repository.models.wxtemplate');
+            $message = new $model();
+            $validator = $app['validator'];
+
+            return new WxTemplateRepository($message, $validator);
+        });
     }
 
     public function registerJsapiTicketRepository()
