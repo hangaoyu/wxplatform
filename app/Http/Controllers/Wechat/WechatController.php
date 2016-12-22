@@ -23,7 +23,7 @@ class WechatController extends Controller
     public function server( Request $request )
     {
         Log::debug(
-            '微信回调原始数据:' . $request->all()
+            '微信回调原始数据:' . json_encode( $request->all(), JSON_UNESCAPED_UNICODE )
         );
         return app('wxmessagerepository')->server();
     }
