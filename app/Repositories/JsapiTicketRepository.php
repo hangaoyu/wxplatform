@@ -31,13 +31,6 @@ class JsapiTicketRepository extends CommonRepository
 
     public function getTicket()
     {
-        //使用Easy WeChat管理access token
-        $wechat = app('wechat');
-        // 获取 access token 实例
-        $accessToken = $wechat->access_token; // EasyWeChat\Core\AccessToken 实例
-        $token = $accessToken->getToken(); // token 字符串
-        return $token;
-
         $lastTicket = $this->getLast();
         if( !$lastTicket ){
             $data = $this->getNewTikcet();
