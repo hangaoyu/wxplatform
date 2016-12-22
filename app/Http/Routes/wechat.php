@@ -9,6 +9,11 @@ Route::any('wechat', [
     'as'         => 'wechat',
     'uses'       => 'WechatController@server',
 ]);
+
+Route::any('weixinApi/callback', [
+    'as'         => 'weixinApi/callback',
+    'uses'       => 'WechatController@server',
+]);
 Route::any('test', [
     'as'         => 'test',
     'uses'       => 'WechatController@test',
