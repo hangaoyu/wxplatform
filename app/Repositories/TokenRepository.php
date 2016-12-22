@@ -31,6 +31,19 @@ class TokenRepository extends CommonRepository
     
     public function getToken()
     {
+        //使用Easy WeChat管理access token
+        $wechat = app('wechat');
+        // 获取 access token 实例
+        $accessToken = $wechat->access_token; // EasyWeChat\Core\AccessToken 实例
+        $token = $accessToken->getToken(); // token 字符串
+        return [
+            'id' => 0,
+            'access_token' => $token,
+            'errcode' => 0,
+            'errmsg' => '',
+            'expires' => ''
+        ];
+
         $lastToken = $this->getLast();
         if( !$lastToken ){
             $data = $this->getNewToken();
