@@ -10,6 +10,7 @@ use App\Models\WxSubMenu;
 use App\Models\WxTemplate;
 use App\Models\WxUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 
 class WechatController extends Controller
@@ -19,8 +20,11 @@ class WechatController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function server()
+    public function server( Request $request )
     {
+        Log::debug(
+            '微信回调原始数据:' . $request->all()
+        );
         return app('wxmessagerepository')->server();
     }
 
