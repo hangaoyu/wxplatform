@@ -51,15 +51,14 @@ class WxTemplateRepository extends CommonRepository
 //请求如果是立即发送直接发送
             if ($delay === '0') {
                 $result = $this->send($data);
-
                 $data['issend'] = 1;
                 $res = WxTemplateMessage::create(array_merge($data, $result));
-                return $result['errmsg'];
+                return ['ret_msg'=>$result['errmsg']];
             } //请求延迟发送赛如数据库然后等平台来检测调用
             else {
                 $data['issend'] = 0;
                 $res = WxTemplateMessage::create(array_merge($data));
-                return 'delay is Ok';
+                return ['ret_msg'=>'delay is Ok'];
             }
         } catch (\Exception $e) {
             return (['retDesc' => $e->getMessage()]);
