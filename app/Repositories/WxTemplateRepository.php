@@ -61,7 +61,7 @@ class WxTemplateRepository extends CommonRepository
                 return ['ret_msg'=>'delay is Ok'];
             }
         } catch (\Exception $e) {
-            return (['retDesc' => $e->getMessage()]);
+            return (['ret_msg' => $e->getMessage()]);
         }
     }
 
