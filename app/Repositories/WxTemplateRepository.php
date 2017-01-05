@@ -51,7 +51,6 @@ class WxTemplateRepository extends CommonRepository
 //请求如果是立即发送直接发送
             if ($delay === '0') {
                 $result = $this->send($data);
-
                 $data['issend'] = 1;
                 $res = WxTemplateMessage::create(array_merge($data, $result));
                 return ['ret_msg'=>$result['errmsg']];
