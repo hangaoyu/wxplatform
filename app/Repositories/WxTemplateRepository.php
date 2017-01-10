@@ -87,6 +87,11 @@ class WxTemplateRepository extends CommonRepository
 
 
         } catch (\Exception $e) {
+            $id = $request->get('id');
+            $temple = WxTemplateMessage::where('id', $request->get('id'))->first();
+            if ($temple){
+                $temple->update(['errmsg'=>$e->getMessage()]);
+            }
             return (['retDesc' => $e->getMessage()]);
         }
     }
