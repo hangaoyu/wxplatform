@@ -48,3 +48,7 @@ Route::post('SendDelayTemplate', [
     'as'         => 'send',
     'uses'       => 'WechatController@sendDelayTemplate',
 ]);
+Route::get('getQrCode', [
+    'as'         => 'getQrCode',
+    'uses'       => 'WechatController@getQrCode',
+]);
