@@ -141,16 +141,17 @@ class WechatController extends Controller
     }
 
     public function getQrCode(){
-        header("content-type: image/jpeg");
-        $scene_id = rand(1,100000);
-        Log::info('生成二维码');
-        $wechat = app('wechat');
-        $qrcode = $wechat->qrcode;
-        $result = $qrcode->forever($scene_id);
-        $ticket = $result->ticket;
-        $url = $qrcode->url($ticket);
-        $content = file_get_contents($url);
-        echo $content;
+        return 'a';
+//        header("content-type: image/jpeg");
+//        $scene_id = rand(1,100000);
+//        Log::info('生成二维码');
+//        $wechat = app('wechat');
+//        $qrcode = $wechat->qrcode;
+//        $result = $qrcode->forever($scene_id);
+//        $ticket = $result->ticket;
+//        $url = $qrcode->url($ticket);
+//        $content = file_get_contents($url);
+//        echo $content;
 //        return $ticket;
     }
 }
