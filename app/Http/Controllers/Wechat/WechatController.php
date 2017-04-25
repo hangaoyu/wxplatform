@@ -154,4 +154,13 @@ class WechatController extends Controller
         echo $content;
 //        return $ticket;
     }
+
+    public function getToken()
+    {
+        $wechat = app('wechat');
+        $accessToken = $wechat->access_token;
+        $token = $accessToken->getToken();
+        return (['token' =>$token]);
+
+    }
 }
