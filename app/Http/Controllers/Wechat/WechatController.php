@@ -32,6 +32,8 @@ class WechatController extends Controller
     public function test()
     {
 
+
+
 //        $content = array(
 //            "first" => "恭喜你购买成功！", "name" => "巧克力", "price" => "39.8元", "remark" => "欢迎再次购买！",
 //        );
@@ -136,5 +138,19 @@ class WechatController extends Controller
         $wechat = app('wechat');
         $menu = $wechat->menu;
         $menu->destroy();
+    }
+
+    public function getQrCode(){
+        header("content-type: image/jpeg");
+        $scene_id = rand(1,100000);
+        Log::info('生成二维码');
+        $wechat = app('wechat');
+        $qrcode = $wechat->qrcode;
+        $result = $qrcode->forever($scene_id);
+        $ticket = $result->ticket;
+        $url = $qrcode->url($ticket);
+        $content = file_get_contents($url);
+        echo $content;
+//        return $ticket;
     }
 }
