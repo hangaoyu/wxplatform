@@ -155,16 +155,23 @@ class WechatController extends Controller
         $data = $request->all();
         Log::info('【微信二维码生成请求】:' . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         $action_name = $data['action_name'];
-        $scene_id = $data['scene_id'];
         try {
             $wechat = app('wechat');
             $qrcode = $wechat->qrcode;
             if ($action_name == 1) {
                 $expire_seconds = $data['expire_seconds'];
+                $scene_id = $data['scene_id'];
                 $result = $qrcode->temporary($scene_id, $expire_seconds);
             } else {
-                $result = $qrcode->forever($scene_id);
+                if ($action_name == 3) {
+                    $scene_str = $data['scene_str'];
+                    $result = $qrcode->forever($scene_str);
+                } else {
+                    $scene_id = $data['scene_id'];
+                    $result = $qrcode->forever($scene_id);
+                }
             }
+
             $ticket = $result->ticket;
             $url = $result->url;
             Log::info('【微信二维码生成成功】:' . json_encode(['ticket' => $ticket, 'url' => $url], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
