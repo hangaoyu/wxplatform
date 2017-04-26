@@ -153,6 +153,7 @@ class WechatController extends Controller
     public function getTicket(Request $request)
     {
         $data = $request->all();
+        Log::info('【微信二维码生成请求】:' . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         $action_name = $data['action_name'];
         $scene_id = $data['scene_id'];
         try {
@@ -166,8 +167,10 @@ class WechatController extends Controller
             }
             $ticket = $result->ticket;
             $url = $result->url;
+            Log::info('【微信二维码生成成功】:' . json_encode(['ticket' => $ticket, 'url' => $url], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
             return ['ticket' => $ticket, 'url' => $url];
         } catch (\Exception $e) {
+            Log::info('【微信二维码生成失败】:' . $e->getMessage());
             return (['err' => 2000, 'retDesc' => $e->getMessage()]);
         }
     }
