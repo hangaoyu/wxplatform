@@ -19,10 +19,11 @@ use EasyWeChat\Message\News;
 class WxMessageRepository extends CommonRepository
 {
 
- 
+
     public function server()
     {
         $wechat = app('wechat');
+
         $wechat->server->setMessageHandler(function ($message) {
             switch ($message->MsgType) {
                 case 'event':
@@ -42,6 +43,10 @@ class WxMessageRepository extends CommonRepository
     public function handleEvent($message)
     {
         $event_name = $message->Event;
+        if ($event_name == 'SCAN') {
+            $result = $this->handleScanEvent($message);
+            return $result;
+        }
         if ($event_name == 'TEMPLATESENDJOBFINISH') {
             $msgId = $message->MsgID;
             $status = $message->Status;
@@ -58,10 +63,9 @@ class WxMessageRepository extends CommonRepository
         }
         try {
             $event = Event::where('event_name', $event_name)->first();
-            if (!$event){
+            if (!$event) {
                 return '';
-            }
-            else{
+            } else {
                 switch ($event->return_id) {
                     case 1:
                         return $event->description;
@@ -86,7 +90,7 @@ class WxMessageRepository extends CommonRepository
     {
         $user_message_name = $user_message->Content;
         $message = Message::where('message_name', $user_message_name)->first();
-        if ($message){
+        if ($message) {
             switch ($message->return_id) {
                 case 1:
                     return $message->description;
@@ -124,6 +128,13 @@ class WxMessageRepository extends CommonRepository
     {
 
         return $message->PicUrl;
+    }
+
+    public function handleScanEvent($message)
+    {
+        $scene_id = $message->EventKey;
+        \Log::info('微信二维码扫描id' . $scene_id);
+        return '';
     }
 
 //    获取用户列表
