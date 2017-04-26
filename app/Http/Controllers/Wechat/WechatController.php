@@ -20,10 +20,10 @@ class WechatController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function server( Request $request )
+    public function server(Request $request)
     {
         Log::debug(
-            '微信回调原始数据:' . json_encode( $request->all(), JSON_UNESCAPED_UNICODE )
+            '微信回调原始数据:' . json_encode($request->all(), JSON_UNESCAPED_UNICODE)
         );
         return app('wxmessagerepository')->server();
     }
@@ -31,7 +31,6 @@ class WechatController extends Controller
 
     public function test()
     {
-
 
 
 //        $content = array(
@@ -104,9 +103,9 @@ class WechatController extends Controller
         $wechat = app('wechat');
         $menu = $wechat->menu;
         $menu->destroy();
-        $mainButtons = WxMenu::where('level', 1)->orderBy('order','ASC')->get();
+        $mainButtons = WxMenu::where('level', 1)->orderBy('order', 'ASC')->get();
         $buttons = collect($mainButtons)->map(function ($mainButton) {
-            $submenu = WxMenu::where('level_id', $mainButton->id)->orderBy('order','ASC')->get();
+            $submenu = WxMenu::where('level_id', $mainButton->id)->orderBy('order', 'ASC')->get();
             if (count($submenu) > 0) {
                 $subbuttons = collect($submenu)->map(function ($subbutton) {
                     return ['type' => $subbutton->type, 'name' => $subbutton->name, 'url' => $subbutton->url];
@@ -140,27 +139,45 @@ class WechatController extends Controller
         $menu->destroy();
     }
 
-    public function getQrCode(){
-
+    public function getQrCode(Request $request)
+    {
+        $ticket = $request->get('ticket');
         header("content-type: image/jpeg");
-        $scene_id = rand(1,100000);
-        Log::info('生成二维码');
         $wechat = app('wechat');
         $qrcode = $wechat->qrcode;
-        $result = $qrcode->forever($scene_id);
-        $ticket = $result->ticket;
         $url = $qrcode->url($ticket);
         $content = file_get_contents($url);
         echo $content;
-//        return $ticket;
     }
+
+    public function getTicket(Request $request)
+    {
+        $data = $request->all();
+        $action_name = $data['action_name'];
+        $scene_id = $data['scene_id'];
+        try {
+            $wechat = app('wechat');
+            $qrcode = $wechat->qrcode;
+            if ($action_name == 1) {
+                $expire_seconds = $data['expire_seconds'];
+                $result = $qrcode->temporary($scene_id, $expire_seconds);
+            } else {
+                $result = $qrcode->forever($scene_id);
+            }
+            $ticket = $result->ticket;
+            $url = $result->url;
+            return ['ticket' => $ticket, 'url' => $url];
+        } catch (\Exception $e) {
+            return (['err' => 2000, 'retDesc' => $e->getMessage()]);
+        }
+    }
+
 
     public function getToken()
     {
         $wechat = app('wechat');
         $accessToken = $wechat->access_token;
         $token = $accessToken->getToken();
-        return (['token' =>$token]);
-
+        return (['token' => $token]);
     }
 }

@@ -52,7 +52,11 @@ Route::get('getQrCode', [
     'as'         => 'getQrCode',
     'uses'       => 'WechatController@getQrCode',
 ]);
-Route::get('getToken', [
-    'as'         => 'getToken',
-    'uses'       => 'WechatController@getToken',
+Route::post('getTicket', [
+    'as'         => 'ticket',
+    'uses'       => 'WechatController@getTicket',
+]);
+Route::post('getQrCode', [
+    'as'         => 'ticket',
+    'uses'       => 'WechatController@getQrCode',
 ]);
