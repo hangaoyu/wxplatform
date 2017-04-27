@@ -62,7 +62,8 @@ class WxMessageRepository extends CommonRepository
             return $this->getReturnNews($event);
         }
         else{
-        return '微信订阅其他途径'.$scene_str;
+            \Log::info('微信订阅其他途径' );
+            $event = Event::where(['event_type'=>'subscribe','scene_str'=>''])->first();
         }
     }
 
