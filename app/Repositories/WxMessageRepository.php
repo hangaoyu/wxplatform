@@ -40,7 +40,7 @@ class WxMessageRepository extends CommonRepository
     public function handleEvent($message)
     {
         $event_name = $message->Event;
-        switch ($message->MsgType) {
+        switch ($event_name) {
             case 'subscribe':
                 return $this->handleSubscribe($message);
             case 'SCAN':
@@ -61,7 +61,7 @@ class WxMessageRepository extends CommonRepository
             return $this->getReturnNews($event);
         }
         else{
-        return '微信订阅其他途径';
+        return '微信订阅其他途径'.$scene_str;
         }
     }
 
