@@ -8,4 +8,8 @@ class Event extends Model
 {
     //
     protected $table='wx_events';
+    public function mulitevent()
+    {
+        return $this->hasMany(WxMultiEvent::class);
+    }
 }

@@ -48,21 +48,10 @@ class WxMessageRepository extends CommonRepository
             return $result;
         }
         if ($event_name == 'TEMPLATESENDJOBFINISH') {
-            $msgId = $message->MsgID;
-            $status = $message->Status;
-            $template_mesaage = WxTemplateMessage::where('msgid', $msgId)->first();
-            if ($template_mesaage) {
-                $template_mesaage->update(['return_status' => $status]);
-            }
-            if ($status !== 'success') {
-                return '发送模板消息失败';
-            } else {
-                return '模板消息发送成功';
-            }
-
+            return $this->templateSendFinish($message);
         }
         try {
-            $event = Event::where('event_name', $event_name)->first();
+            $event = Event::where('event_type', $event_name)->first();
             if (!$event) {
                 return '';
             } else {
@@ -120,21 +109,65 @@ class WxMessageRepository extends CommonRepository
                     return $mulitnews;
             }
         }
-
-
     }
 
     public function handleImage($message)
     {
-
         return $message->PicUrl;
     }
 
     public function handleScanEvent($message)
     {
-        $scene_id = $message->EventKey;
-        \Log::info('微信二维码扫描id' . $scene_id);
+        $scene_str = $message->EventKey;
+        \Log::info('微信二维码扫描id' . $scene_str);
+        $event = Event::where('scene_str', $scene_str)->first();
+        if (!$event) {
+            return '';
+        } else {
+            switch ($event->return_id) {
+                case 1:
+                    return $event->description;
+                case 2:
+                    $news = new News([
+                        'title' => $event->title,
+                        'description' => $event->description,
+                        'url' => $event->content_url,
+                        'image' => $event->image,
+                        // ...
+                    ]);
+                    return $news;
+                case 3:
+                    $mulitnews = [];
+                    $mulitevents = $event->mulitevent;
+                    foreach ($mulitevents as $key => $event) {
+                        $news = new News([
+                            'title' => $event->title,
+                            'description' => $event->description,
+                            'url' => $event->content_url,
+                        'image' => $event->image,
+
+                        ]);
+                        array_push($mulitnews, $news);
+                    }
+                    return $mulitnews;
+            }
+        }
         return '';
+    }
+
+    public function templateSendFinish($message)
+    {
+        $msgId = $message->MsgID;
+        $status = $message->Status;
+        $template_mesaage = WxTemplateMessage::where('msgid', $msgId)->first();
+        if ($template_mesaage) {
+            $template_mesaage->update(['return_status' => $status]);
+        }
+        if ($status !== 'success') {
+            return '发送模板消息失败';
+        } else {
+            return '模板消息发送成功';
+        }
     }
 
 //    获取用户列表
