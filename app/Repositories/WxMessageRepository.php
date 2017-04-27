@@ -23,7 +23,6 @@ class WxMessageRepository extends CommonRepository
     public function server()
     {
         $wechat = app('wechat');
-
         $wechat->server->setMessageHandler(function ($message) {
             switch ($message->MsgType) {
                 case 'event':
@@ -34,8 +33,6 @@ class WxMessageRepository extends CommonRepository
                     return $this->handleImage($message);
             }
         });
-
-
         return $wechat->server->serve();
 
     }
@@ -43,35 +40,87 @@ class WxMessageRepository extends CommonRepository
     public function handleEvent($message)
     {
         $event_name = $message->Event;
-        if ($event_name == 'SCAN') {
-            $result = $this->handleScanEvent($message);
-            return $result;
+        switch ($message->MsgType) {
+            case 'subscribe':
+                return $this->handleSubscribe($message);
+            case 'SCAN':
+                return $this->handleScanEvent($message);
+            case 'TEMPLATESENDJOBFINISH':
+                return $this->templateSendFinish($message);
         }
-        if ($event_name == 'TEMPLATESENDJOBFINISH') {
-            return $this->templateSendFinish($message);
+
+    }
+
+    public function handleSubscribe($message)
+    {
+        $scene_str = $message->EventKey;
+
+        if ($scene_str) {
+            \Log::info('微信订阅带二维码参数' . $scene_str);
+            $event = Event::where('scene_str', $scene_str)->first();
+            return $this->getReturnNews($event);
         }
-        try {
-            $event = Event::where('event_type', $event_name)->first();
-            if (!$event) {
-                return '';
-            } else {
-                switch ($event->return_id) {
-                    case 1:
-                        return $event->description;
-                    case 2:
+        else{
+            \Log::info('微信订阅其他途径' . $scene_str);
+        }
+    }
+
+    public function handleScanEvent($message)
+    {
+        $scene_str = $message->EventKey;
+        \Log::info('微信二维码扫描id' . $scene_str);
+        $event = Event::where('scene_str', $scene_str)->first();
+        return $this->getReturnNews($event);
+
+    }
+
+    public function getReturnNews(Event $event)
+    {
+        if (!$event) {
+            return '';
+        } else {
+            switch ($event->return_id) {
+                case 1:
+                    return $event->description;
+                case 2:
+                    $news = new News([
+                        'title' => $event->title,
+                        'description' => $event->description,
+                        'url' => $event->content_url,
+                        'image' => $event->image,
+                        // ...
+                    ]);
+                    return $news;
+                case 3:
+                    $mulitnews = [];
+                    $mulitevents = $event->mulitevent;
+                    foreach ($mulitevents as $key => $event) {
                         $news = new News([
                             'title' => $event->title,
                             'description' => $event->description,
-//                        'url' => $event->content_url,
+                            'url' => $event->content_url,
                             'image' => $event->image,
-                            // ...
-                        ]);
-                        return $news;
-                }
-            }
 
-        } catch (\Exception $e) {
-            return $e->getMessage();
+                        ]);
+                        array_push($mulitnews, $news);
+                    }
+                    return $mulitnews;
+            }
+        }
+    }
+
+    public function templateSendFinish($message)
+    {
+        $msgId = $message->MsgID;
+        $status = $message->Status;
+        $template_mesaage = WxTemplateMessage::where('msgid', $msgId)->first();
+        if ($template_mesaage) {
+            $template_mesaage->update(['return_status' => $status]);
+        }
+        if ($status !== 'success') {
+            return '发送模板消息失败';
+        } else {
+            return '模板消息发送成功';
         }
     }
 
@@ -116,59 +165,6 @@ class WxMessageRepository extends CommonRepository
         return $message->PicUrl;
     }
 
-    public function handleScanEvent($message)
-    {
-        $scene_str = $message->EventKey;
-        \Log::info('微信二维码扫描id' . $scene_str);
-        $event = Event::where('scene_str', $scene_str)->first();
-        if (!$event) {
-            return '';
-        } else {
-            switch ($event->return_id) {
-                case 1:
-                    return $event->description;
-                case 2:
-                    $news = new News([
-                        'title' => $event->title,
-                        'description' => $event->description,
-                        'url' => $event->content_url,
-                        'image' => $event->image,
-                        // ...
-                    ]);
-                    return $news;
-                case 3:
-                    $mulitnews = [];
-                    $mulitevents = $event->mulitevent;
-                    foreach ($mulitevents as $key => $event) {
-                        $news = new News([
-                            'title' => $event->title,
-                            'description' => $event->description,
-                            'url' => $event->content_url,
-                        'image' => $event->image,
-
-                        ]);
-                        array_push($mulitnews, $news);
-                    }
-                    return $mulitnews;
-            }
-        }
-        return '';
-    }
-
-    public function templateSendFinish($message)
-    {
-        $msgId = $message->MsgID;
-        $status = $message->Status;
-        $template_mesaage = WxTemplateMessage::where('msgid', $msgId)->first();
-        if ($template_mesaage) {
-            $template_mesaage->update(['return_status' => $status]);
-        }
-        if ($status !== 'success') {
-            return '发送模板消息失败';
-        } else {
-            return '模板消息发送成功';
-        }
-    }
 
 //    获取用户列表
     public function getUserlist()
