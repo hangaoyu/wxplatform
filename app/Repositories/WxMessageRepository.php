@@ -53,6 +53,7 @@ class WxMessageRepository extends CommonRepository
 
     public function handleSubscribe($message)
     {
+        \Log::info('订阅事件：'.json_decode($message));
         $scene_str = $message->EventKey;
         $this->handleSubscribePoints();
         if ($scene_str) {
@@ -128,11 +129,6 @@ class WxMessageRepository extends CommonRepository
 
     public function handleMessage($user_message)
     {
-        $wechat = app('wechat');
-        $user = $wechat->oauth->user();
-//        $open_id = $user->getId();
-      
-        return $user;
         $user_message_name = $user_message->Content;
         $message = Message::where('message_name', $user_message_name)->first();
         if ($message) {
@@ -174,10 +170,7 @@ class WxMessageRepository extends CommonRepository
 
     public function handleSubscribePoints()
     {
-        $wechat = app('wechat');
-        $user = $wechat->oauth->user();
-        $open_id = $user->getId();
-        return $open_id;
+
     }
 
 //    获取用户列表
