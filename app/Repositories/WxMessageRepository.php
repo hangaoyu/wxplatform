@@ -167,10 +167,12 @@ class WxMessageRepository extends CommonRepository
         return $message->PicUrl;
     }
 
-    public function handleSubscribePoints(){
+    public function handleSubscribePoints()
+    {
         $wechat = app('wechat');
-        $userService = $wechat->user;
-        \Log::info($userService);
+        $user = $wechat->oauth->user();
+        $open_id = $user->getId();
+        return $open_id;
     }
 
 //    获取用户列表
