@@ -128,6 +128,11 @@ class WxMessageRepository extends CommonRepository
 
     public function handleMessage($user_message)
     {
+        $wechat = app('wechat');
+        $user = $wechat->oauth->user();
+//        $open_id = $user->getId();
+      
+        return $user;
         $user_message_name = $user_message->Content;
         $message = Message::where('message_name', $user_message_name)->first();
         if ($message) {
