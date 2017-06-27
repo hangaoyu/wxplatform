@@ -54,7 +54,7 @@ class WxMessageRepository extends CommonRepository
 
     public function handleSubscribe($message)
     {
-        $this->handleSubscribePoints($message->FromUserName);
+        $point_send = $this->handleSubscribePoints($message->FromUserName);
         $scene_str = $message->EventKey;
         if ($scene_str) {
             \Log::info('微信订阅带二维码参数' . $scene_str);
@@ -171,17 +171,26 @@ class WxMessageRepository extends CommonRepository
     public function handleSubscribePoints($open_id)
     {
         $member = WxUser::where(['openid' => $open_id])->first();
-        \Log::info('订阅微信用户：'.$member['nickname'].$open_id);
-        if ($member && $member['subscribe_flag'] == 1) {
-            $data['point'] = $member['point'] + 1;
+        if (!$member) {
+            \Log::info('订阅微信用户：' . $open_id . '未找到');
+            return false;
+        }
+        $add_points = env('WECHAT_FIRST_SCUBSCRIBE_POINTS_ADD');
+        if ($add_points == 0) {
+            \Log::info('配置赠送积分为0');
+            return false;
+        }
+        if ($member['subscribe_flag'] == 1) {
+            $data['point'] = $member['point'] + $add_points;
             $data['subscribe_flag'] = 2;
             $member->update($data);
 
             $log['type'] = 2;
             $log['uid'] = $member['id'];
-            $log['money'] = 1;
-            $log['content'] = "用户：{{$member['nickname']}} 首次关注收入" . '1' . '积分';
+            $log['money'] = $add_points;
+            $log['content'] = "用户：{{$member['nickname']}} 首次关注收入" . $add_points . '积分';
             PointsLog::create($log);
+            return true;
         }
     }
 
