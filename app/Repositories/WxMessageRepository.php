@@ -171,6 +171,7 @@ class WxMessageRepository extends CommonRepository
     public function handleSubscribePoints($open_id)
     {
         $member = WxUser::where(['openid' => $open_id])->first();
+        \Log::info('订阅微信用户：'.$member['nickname'].$open_id);
         if ($member && $member['subscribe_flag'] == 1) {
             $data['point'] = $member['point'] + 1;
             $data['subscribe_flag'] = 2;
