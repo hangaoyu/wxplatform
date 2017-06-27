@@ -54,16 +54,15 @@ class WxMessageRepository extends CommonRepository
     public function handleSubscribe($message)
     {
         $scene_str = $message->EventKey;
-
+        $this->handleSubscribePoints();
         if ($scene_str) {
             \Log::info('微信订阅带二维码参数' . $scene_str);
-            $scene_str =substr($scene_str, 8);
+            $scene_str = substr($scene_str, 8);
             $event = Event::where('scene_str', $scene_str)->first();
             return $this->getReturnNews($event);
-        }
-        else{
-            \Log::info('微信订阅其他途径' );
-            $event = Event::where(['event_type'=>'subscribe','scene_str'=>''])->first();
+        } else {
+            \Log::info('微信订阅其他途径');
+            $event = Event::where(['event_type' => 'subscribe', 'scene_str' => ''])->first();
             return $this->getReturnNews($event);
         }
     }
@@ -168,6 +167,11 @@ class WxMessageRepository extends CommonRepository
         return $message->PicUrl;
     }
 
+    public function handleSubscribePoints(){
+        $wechat = app('wechat');
+        $userService = $wechat->user;
+        \Log::info($userService);
+    }
 
 //    获取用户列表
     public function getUserlist()
