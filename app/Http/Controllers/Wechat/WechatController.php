@@ -32,7 +32,9 @@ class WechatController extends Controller
     public function test()
     {
 
-
+        $wechat = app('wechat');
+        $userService = $wechat->user;
+        dd($userService);
 //        $content = array(
 //            "first" => "恭喜你购买成功！", "name" => "巧克力", "price" => "39.8元", "remark" => "欢迎再次购买！",
 //        );
