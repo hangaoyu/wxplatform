@@ -53,7 +53,7 @@ class WxMessageRepository extends CommonRepository
 
     public function handleSubscribe($message)
     {
-        \Log::info('订阅事件：'.json_decode($message));
+        \Log::info('订阅事件用户openid：'.$message->FromUserName);
         $scene_str = $message->EventKey;
         $this->handleSubscribePoints();
         if ($scene_str) {
