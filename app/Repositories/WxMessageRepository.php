@@ -11,6 +11,7 @@ namespace App\Repositories;
 
 use App\Models\Event;
 use App\Models\Message;
+use App\Models\PointsLog;
 use App\Models\WxTemplate;
 use App\Models\WxTemplateMessage;
 use App\Models\WxUser;
@@ -53,9 +54,8 @@ class WxMessageRepository extends CommonRepository
 
     public function handleSubscribe($message)
     {
-        \Log::info('订阅事件用户openid：'.$message->FromUserName);
+        $this->handleSubscribePoints($message->FromUserName);
         $scene_str = $message->EventKey;
-        $this->handleSubscribePoints();
         if ($scene_str) {
             \Log::info('微信订阅带二维码参数' . $scene_str);
             $scene_str = substr($scene_str, 8);
@@ -168,9 +168,20 @@ class WxMessageRepository extends CommonRepository
         return $message->PicUrl;
     }
 
-    public function handleSubscribePoints()
+    public function handleSubscribePoints($open_id)
     {
+        $member = WxUser::where(['openid' => $open_id])->first();
+        if ($member && $member['subscribe_flag'] == 1) {
+            $data['point'] = $member['point'] + 1;
+            $data['subscribe_flag'] = 2;
+            $member->update($data);
 
+            $log['type'] = 2;
+            $log['uid'] = $member['id'];
+            $log['money'] = 1;
+            $log['content'] = "用户：{{$member['nickname']}} 首次关注收入" . '1' . '积分';
+            PointsLog::create($log);
+        }
     }
 
 //    获取用户列表

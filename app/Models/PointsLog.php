@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class WxUser extends Model
+class PointsLog extends Model
 {
-    protected $table = 'wx_members';
+    protected $table = 'points_mall_point_log';
     protected $guarded = ['id'];
 }
