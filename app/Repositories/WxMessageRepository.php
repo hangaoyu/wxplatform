@@ -60,7 +60,6 @@ class WxMessageRepository extends CommonRepository
         $point_send = $this->handleSubscribePoints($message->FromUserName);
         $scene_str = $message->EventKey;
         if ($scene_str) {
-            $this->scanLog($message);
             \Log::info('微信订阅带二维码参数' . $scene_str);
             $scene_str = substr($scene_str, 8);
             $event = Event::where('scene_str', $scene_str)->first();
@@ -78,7 +77,6 @@ class WxMessageRepository extends CommonRepository
     public function handleScanEvent($message)
     {
         $scene_str = $message->EventKey;
-        $this->scanLog($message);
         \Log::info('微信二维码扫描id' . $scene_str);
         $event = Event::where('scene_str', $scene_str)->first();
         if ($event) {
@@ -99,6 +97,7 @@ class WxMessageRepository extends CommonRepository
             }
 
         }
+        $this->scanLog($message);
 //返回回复信息
         switch ($event->return_id) {
             case 1:
