@@ -90,14 +90,15 @@ class WxMessageRepository extends CommonRepository
     {
 //        检查事件是否只能在首次扫描的时候返回信息
         $return_flag = $event['return_flag'];
-        if ($return_flag = 1) {
+        if ($return_flag == 1) {
             $log_count = WxScanLog::where(['open_id' => $message->FromUserName, 'scene_str' => $message->EventKey])->count();
+            $this->scanLog($message);
             if ($log_count > 0) {
                 return '';
             }
 
         }
-        $this->scanLog($message);
+
 //返回回复信息
         switch ($event->return_id) {
             case 1:
