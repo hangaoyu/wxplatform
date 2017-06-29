@@ -11,7 +11,9 @@ namespace App\Repositories;
 
 use App\Models\Event;
 use App\Models\Message;
+
 use App\Models\PointsLog;
+
 use App\Models\WxScanLog;
 use App\Models\WxTemplate;
 use App\Models\WxTemplateMessage;
@@ -175,6 +177,14 @@ class WxMessageRepository extends CommonRepository
     {
         return $message->PicUrl;
     }
+    public function scanLog($message)
+    {
+        $log['open_id'] = $message->FromUserName;
+        $log['scene_str'] = $message->EventKey;
+        $log['scan_time'] = date('Y-m-d H:i:s', $message->CreateTime);
+        WxScanLog::create($log);
+
+    }
 
     public function handleSubscribePoints($open_id)
     {
@@ -201,14 +211,8 @@ class WxMessageRepository extends CommonRepository
             return true;
         }
     }
-    public function scanLog($message)
-    {
-        $log['open_id'] = $message->FromUserName;
-        $log['scene_str'] = $message->EventKey;
-        $log['scan_time'] = date('Y-m-d H:i:s', $message->CreateTime);
-        WxScanLog::create($log);
 
-    }
+
 
 
 //    获取用户列表
