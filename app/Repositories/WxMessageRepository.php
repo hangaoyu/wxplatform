@@ -57,15 +57,16 @@ class WxMessageRepository extends CommonRepository
 
         if ($scene_str) {
             \Log::info('微信订阅带二维码参数' . $scene_str);
-            $scene_str =substr($scene_str, 8);
+            $scene_str = substr($scene_str, 8);
             $event = Event::where('scene_str', $scene_str)->first();
+        } else {
+            \Log::info('微信订阅其他途径');
+            $event = Event::where(['event_type' => 'subscribe', 'scene_str' => ''])->first();
+        }
+        if ($event) {
             return $this->getReturnNews($event);
         }
-        else{
-            \Log::info('微信订阅其他途径' );
-            $event = Event::where(['event_type'=>'subscribe','scene_str'=>''])->first();
-            return $this->getReturnNews($event);
-        }
+        return '';
     }
 
     public function handleScanEvent($message)
