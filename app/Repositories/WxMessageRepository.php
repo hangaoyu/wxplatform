@@ -64,12 +64,13 @@ class WxMessageRepository extends CommonRepository
             \Log::info('微信订阅带二维码参数' . $scene_str);
             $scene_str = substr($scene_str, 8);
             $event = Event::where('scene_str', $scene_str)->first();
+
         } else {
             \Log::info('微信订阅其他途径');
             $event = Event::where(['event_type' => 'subscribe', 'scene_str' => ''])->first();
         }
         if ($event) {
-            return $this->getReturnNews($event);
+            return $this->getReturnNews($event, $message);
         }
         return '';
     }
@@ -81,45 +82,52 @@ class WxMessageRepository extends CommonRepository
         \Log::info('微信二维码扫描id' . $scene_str);
         $event = Event::where('scene_str', $scene_str)->first();
         if ($event) {
-            return $this->getReturnNews($event);
+            return $this->getReturnNews($event, $message);
         }
         return '';
 
     }
 
-    public function getReturnNews(Event $event)
+    public function getReturnNews(Event $event, $message)
     {
-        if (!$event) {
-            return '';
-        } else {
-            switch ($event->return_id) {
-                case 1:
-                    return $event->description;
-                case 2:
+//        检查事件是否只能在首次扫描的时候返回信息
+        $return_flag = $event['return_flag'];
+        if ($return_flag = 1) {
+            $log_count = WxScanLog::where(['open_id' => $message->FromUserName, 'scene_str' => $message->EventKey])->count();
+            if ($log_count > 0) {
+                return '';
+            }
+
+        }
+//返回回复信息
+        switch ($event->return_id) {
+            case 1:
+                return $event->description;
+            case 2:
+                $news = new News([
+                    'title' => $event->title,
+                    'description' => $event->description,
+                    'url' => $event->content_url,
+                    'image' => $event->image,
+                    // ...
+                ]);
+                return $news;
+            case 3:
+                $mulitnews = [];
+                $mulitevents = $event->mulitevent;
+                foreach ($mulitevents as $key => $event) {
                     $news = new News([
                         'title' => $event->title,
                         'description' => $event->description,
                         'url' => $event->content_url,
                         'image' => $event->image,
-                        // ...
-                    ]);
-                    return $news;
-                case 3:
-                    $mulitnews = [];
-                    $mulitevents = $event->mulitevent;
-                    foreach ($mulitevents as $key => $event) {
-                        $news = new News([
-                            'title' => $event->title,
-                            'description' => $event->description,
-                            'url' => $event->content_url,
-                            'image' => $event->image,
 
-                        ]);
-                        array_push($mulitnews, $news);
-                    }
-                    return $mulitnews;
-            }
+                    ]);
+                    array_push($mulitnews, $news);
+                }
+                return $mulitnews;
         }
+
     }
 
     public function templateSendFinish($message)
@@ -177,6 +185,7 @@ class WxMessageRepository extends CommonRepository
     {
         return $message->PicUrl;
     }
+
     public function scanLog($message)
     {
         $log['open_id'] = $message->FromUserName;
