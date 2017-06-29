@@ -78,7 +78,8 @@ class WxMessageRepository extends CommonRepository
     public function handleScanEvent($message)
     {
         $scene_str = $message->EventKey;
-        \Log::info('微信二维码扫描id' . $scene_str);
+        $ticket = $message->Ticket;
+        \Log::info('微信二维码扫描ticket' . $ticket);
         $event = Event::where('scene_str', $scene_str)->first();
         if ($event) {
             return $this->getReturnNews($event, $message);
