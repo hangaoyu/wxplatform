@@ -62,7 +62,7 @@ class WxMessageRepository extends CommonRepository
         if ($scene_str) {
             \Log::info('微信订阅带二维码参数' . $scene_str);
             $scene_str = substr($scene_str, 8);
-            $message->FromUserName = $scene_str;
+            $message->EventKey = $scene_str;
             $event = Event::where('scene_str', $scene_str)->first();
 
         } else {
