@@ -12,6 +12,7 @@ namespace App\Repositories;
 use App\Models\Event;
 use App\Models\Message;
 use App\Models\PointsLog;
+use App\Models\WxScanLog;
 use App\Models\WxTemplate;
 use App\Models\WxTemplateMessage;
 use App\Models\WxUser;
@@ -57,6 +58,7 @@ class WxMessageRepository extends CommonRepository
         $point_send = $this->handleSubscribePoints($message->FromUserName);
         $scene_str = $message->EventKey;
         if ($scene_str) {
+            $this->scanLog($message);
             \Log::info('微信订阅带二维码参数' . $scene_str);
             $scene_str = substr($scene_str, 8);
             $event = Event::where('scene_str', $scene_str)->first();
@@ -73,6 +75,7 @@ class WxMessageRepository extends CommonRepository
     public function handleScanEvent($message)
     {
         $scene_str = $message->EventKey;
+        $this->scanLog($message);
         \Log::info('微信二维码扫描id' . $scene_str);
         $event = Event::where('scene_str', $scene_str)->first();
         if ($event) {
@@ -198,6 +201,15 @@ class WxMessageRepository extends CommonRepository
             return true;
         }
     }
+    public function scanLog($message)
+    {
+        $log['open_id'] = $message->FromUserName;
+        $log['scene_str'] = $message->EventKey;
+        $log['scan_time'] = date('Y-m-d H:i:s', $message->CreateTime);
+        WxScanLog::create($log);
+
+    }
+
 
 //    获取用户列表
     public function getUserlist()
