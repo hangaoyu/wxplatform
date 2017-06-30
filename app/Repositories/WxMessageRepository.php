@@ -194,7 +194,7 @@ class WxMessageRepository extends CommonRepository
     public function scanLog($message)
     {
         $log['open_id'] = $message->FromUserName?$message->FromUserName:'';
-        $log['scene_str'] = $message->EventKey?$message->FromUserName:'';
+        $log['scene_str'] = $message->EventKey?$message->EventKey:'';
         $log['scan_time'] = $message->CreateTime?date('Y-m-d H:i:s', $message->CreateTime):Carbon::now();
         WxScanLog::create($log);
 
