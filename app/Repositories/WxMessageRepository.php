@@ -95,7 +95,9 @@ class WxMessageRepository extends CommonRepository
             if ($log_count > 0) {
                 return '';
             }
-
+        }
+        else{
+            $this->scanLog($message);
         }
 
 //返回回复信息
