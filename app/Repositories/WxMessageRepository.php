@@ -196,7 +196,7 @@ class WxMessageRepository extends CommonRepository
         $log['scene_str'] = $message->EventKey?$message->EventKey:'';
         $log['event_type'] = $message->Event?$message->Event:'';
         $log['scan_time'] = $message->CreateTime?date('Y-m-d H:i:s', $message->CreateTime):Carbon::now();
-        $log['month'] = date_format($message->CreateTime,"Y-m");
+        $log['month'] = date("Y-m",$message->CreateTime);
         WxScanLog::create($log);
 
     }
