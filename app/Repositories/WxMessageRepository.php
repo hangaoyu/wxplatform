@@ -52,6 +52,8 @@ class WxMessageRepository extends CommonRepository
                 return $this->handleScanEvent($message);
             case 'TEMPLATESENDJOBFINISH':
                 return $this->templateSendFinish($message);
+            case 'unsubscribe':
+                return $this->scanLog($message);
         }
 
     }
@@ -195,6 +197,7 @@ class WxMessageRepository extends CommonRepository
     {
         $log['open_id'] = $message->FromUserName?$message->FromUserName:'';
         $log['scene_str'] = $message->EventKey?$message->EventKey:'';
+        $log['event_type'] = $message->Event?$message->Event:'';
         $log['scan_time'] = $message->CreateTime?date('Y-m-d H:i:s', $message->CreateTime):Carbon::now();
         WxScanLog::create($log);
 
