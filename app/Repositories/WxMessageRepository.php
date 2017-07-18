@@ -87,6 +87,7 @@ class WxMessageRepository extends CommonRepository
         if ($event) {
             return $this->getReturnNews($event, $message);
         }
+        $this->scanLog($message);
         return '';
 
     }
