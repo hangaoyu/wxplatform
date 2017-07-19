@@ -50,7 +50,7 @@ class WxMessageRepository extends CommonRepository
             case 'TEMPLATESENDJOBFINISH':
                 return $this->templateSendFinish($message);
             case 'unsubscribe':
-                return $this->scanLog($message);
+                return $this->unsucribeScanLog($message);
         }
 
     }
@@ -198,6 +198,18 @@ class WxMessageRepository extends CommonRepository
         $log['scene_str'] = $message->EventKey?$message->EventKey:'';
         $log['event_type'] = $message->Event?$message->Event:'';
         $log['scan_time'] = $message->CreateTime?date('Y-m-d H:i:s', $message->CreateTime):Carbon::now();
+        $log['month'] = date("Y-m",$message->CreateTime);
+        WxScanLog::create($log);
+
+    }
+    public function unsucribeScanLog($message){
+        $log['open_id'] = $message->FromUserName?$message->FromUserName:'';
+        $log['scan_time'] = $message->CreateTime?date('Y-m-d H:i:s', $message->CreateTime):Carbon::now();
+        $log['event_type'] = $message->Event?$message->Event:'';
+        $data = WxScanLog::where(['open_id' =>$log['open_id'], 'event_type' => 'subscribe'])
+            ->where('created_at', '<', $log['scan_time'])
+            ->orderBy('created_at', 'DESC')->first();
+        $log['scene_str'] = $data['scene_str'];
         $log['month'] = date("Y-m",$message->CreateTime);
         WxScanLog::create($log);
 
