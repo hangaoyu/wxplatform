@@ -17,8 +17,13 @@ class ApiAuthenticate
     public function handle($request, Closure $next)
     {
         $ip = $request->getClientIp();
-        $store_ip = Storage::disk('client')->get('officeIp.txt');
-        $whiteList = array_merge(config('api.whiteList.token'),array($store_ip));
+        if (file_exists(storage_path('officeIp.txt'))){
+            $store_ip = Storage::disk('client')->get('officeIp.txt');
+            $whiteList = array_merge(config('api.whiteList.token'),array($store_ip));
+        }
+        else{
+            $whiteList = config('api.whiteList.token');
+        }
         if( in_array($ip,$whiteList ) ){
             return $next($request);
         }
