@@ -1,6 +1,6 @@
 <?php
 
-$url = "http://0.0.0.0:1024/frontend/updateClient";
+$url = "http://wx-platform.jojin.com/frontend/updateClient";
 $post_data = array("client_pwd" => "rexun123123");
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
