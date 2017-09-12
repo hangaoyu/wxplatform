@@ -10,14 +10,14 @@ Route::group(['namespace' => 'Auth'], function () {
 });
 
 /* 前端管理模块 */
-Route::group(['namespace' => 'Frontend'], function () {
+Route::group(['namespace' => 'Frontend', 'prefix' => 'frontend', ], function () {
     require_once __DIR__ . '/Routes/frontend.php';
 });
 
 /* 后台管理模块 */
 Route::group([
-    'prefix'     => 'backend',
-    'namespace'  => 'Backend',
+    'prefix' => 'backend',
+    'namespace' => 'Backend',
     'middleware' => ['authenticate', 'authorize'],
 ], function () {
     require_once __DIR__ . '/Routes/backend.php';
@@ -25,8 +25,8 @@ Route::group([
 
 /* 接口模块 */
 Route::group([
-    'prefix'     => 'api',
-    'namespace'  => 'Api',
+    'prefix' => 'api',
+    'namespace' => 'Api',
     'middleware' => ['apiAuthenticate'],
 ], function () {
     require_once __DIR__ . '/Routes/api.php';
@@ -34,8 +34,8 @@ Route::group([
 
 /* 微信处理 */
 Route::group([
-  
-    'namespace'  => 'Wechat',
+
+    'namespace' => 'Wechat',
 
 ], function () {
     require_once __DIR__ . '/Routes/wechat.php';

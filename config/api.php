@@ -21,5 +21,8 @@ return [
             '36.24.26.244',
             '125.122.209.178',
         ]
-    ]
+    ],
+    'updateOfficeIpKey'=>env('UPDATE_OFFICE_IP_KEY'),
+    'postUrl'=>env('CLIENT_POST_URL'),
+
 ];
