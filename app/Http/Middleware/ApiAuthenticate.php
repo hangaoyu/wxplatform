@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Storage;
 
 class ApiAuthenticate
 {
@@ -16,7 +17,8 @@ class ApiAuthenticate
     public function handle($request, Closure $next)
     {
         $ip = $request->getClientIp();
-        $whiteList = config('api.whiteList.token');
+        $store_ip = Storage::disk('client')->get('officeIp.txt');
+        $whiteList = array_merge(config('api.whiteList.token'),array($store_ip));
         if( in_array($ip,$whiteList ) ){
             return $next($request);
         }
