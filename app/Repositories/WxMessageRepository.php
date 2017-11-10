@@ -42,6 +42,7 @@ class WxMessageRepository extends CommonRepository
     public function handleEvent($message)
     {
         $event_name = $message->Event;
+        \Log::info('事件类型' . $event_name);
         switch ($event_name) {
             case 'subscribe':
                 return $this->handleSubscribe($message);
