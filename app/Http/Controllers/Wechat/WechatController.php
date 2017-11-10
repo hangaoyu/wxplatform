@@ -117,6 +117,7 @@ class WechatController extends Controller
                     "type" => $mainButton->type,
                     "name" => $mainButton->name,
                     "url" => $mainButton->url,
+                    'key'=>$mainButton->key,
                 ];
             }
         })->toArray();
