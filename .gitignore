@@ -8,3 +8,4 @@ composer.phar
 
 /storage
 /.env
+/.DS_Store
