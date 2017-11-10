@@ -29,16 +29,16 @@ class WxMessageRepository extends CommonRepository
     {
         \Log::info('wx server入口');
         $wechat = app('wechat');
-//        $wechat->server->setMessageHandler(function ($message) {
-//            switch ($message->MsgType) {
-//                case 'event':
-//                    return $this->handleEvent($message);
-//                case 'text':
-//                    return $this->handleMessage($message);
-//                case 'image':
-//                    return $this->handleImage($message);
-//            }
-//        });
+        $wechat->server->setMessageHandler(function ($message) {
+            switch ($message->MsgType) {
+                case 'event':
+                    return $this->handleEvent($message);
+                case 'text':
+                    return $this->handleMessage($message);
+                case 'image':
+                    return $this->handleImage($message);
+            }
+        });
         return $wechat->server->serve();
 
     }
@@ -56,8 +56,8 @@ class WxMessageRepository extends CommonRepository
                 return $this->templateSendFinish($message);
             case 'unsubscribe':
                 return $this->unsucribeScanLog($message);
-//            case 'CLICK':
-//                return $this->handleclick($message);
+            case 'CLICK':
+                return $this->handleclick($message);
         }
 
     }
