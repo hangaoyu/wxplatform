@@ -111,15 +111,24 @@ class WechatController extends Controller
             $submenu = WxMenu::where('level_id', $mainButton->id)->orderBy('order', 'ASC')->get();
             if (count($submenu) > 0) {
                 $subbuttons = collect($submenu)->map(function ($subbutton) {
-                    return ['type' => $subbutton->type, 'name' => $subbutton->name, 'url' => $subbutton->url];
+                    if ($subbutton->type == 'view'){
+                        return ['type' => $subbutton->type, 'name' => $subbutton->name, 'url' => $subbutton->url];
+                    }
+                    return ['type' => $subbutton->type, 'name' => $subbutton->name, 'key' => $subbutton->key];
                 })->toArray();
                 return ['name' => $mainButton->name, 'sub_button' => $subbuttons];
 
             } else {
+                if ($mainButton->type == 'view'){
+                    return [
+                        "type" => $mainButton->type,
+                        "name" => $mainButton->name,
+                        "url" => $mainButton->url,
+                    ];
+                }
                 return [
                     "type" => $mainButton->type,
                     "name" => $mainButton->name,
-                    "url" => $mainButton->url,
                     'key'=>$mainButton->key,
                 ];
             }
