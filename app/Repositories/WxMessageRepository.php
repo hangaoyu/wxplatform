@@ -52,8 +52,8 @@ class WxMessageRepository extends CommonRepository
                 return $this->templateSendFinish($message);
             case 'unsubscribe':
                 return $this->unsucribeScanLog($message);
-            case 'CLICK':
-                return $this->handleclick($message);
+//            case 'CLICK':
+//                return $this->handleclick($message);
         }
 
     }
