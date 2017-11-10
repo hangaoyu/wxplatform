@@ -27,6 +27,7 @@ class WxMessageRepository extends CommonRepository
 
     public function server()
     {
+        \Log::info('wx server入口');
         $wechat = app('wechat');
 //        $wechat->server->setMessageHandler(function ($message) {
 //            switch ($message->MsgType) {
