@@ -99,7 +99,7 @@ class WxMessageRepository extends CommonRepository
     public function handleClick($message){
         $scene_str = $message->EventKey;
         \Log::info('点击事件');
-        $event = Event::where(['scene_str'=>$scene_str,'event_type' => 'subscribe'])->first();
+        $event = Event::where(['scene_str'=>$scene_str,'event_type' => 'CLICK'])->first();
         if ($event) {
             return $this->getReturnNews($event, $message);
         }
