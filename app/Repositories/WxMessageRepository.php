@@ -54,6 +54,8 @@ class WxMessageRepository extends CommonRepository
                 return $this->templateSendFinish($message);
             case 'unsubscribe':
                 return $this->unsucribeScanLog($message);
+            case 'CLICK':
+                return $this->handleclick($message);
         }
 
     }
@@ -91,6 +93,16 @@ class WxMessageRepository extends CommonRepository
         $this->scanLog($message);
         return '';
 
+    }
+    public function handleClick($message){
+        $scene_str = $message->EventKey;
+        \Log::info('点击事件');
+        $event = Event::where(['scene_str'=>$scene_str,'event_type' => 'subscribe'])->first();
+        if ($event) {
+            return $this->getReturnNews($event, $message);
+        }
+        $this->scanLog($message);
+        return '';
     }
 
     public function getReturnNews(Event $event, $message)
