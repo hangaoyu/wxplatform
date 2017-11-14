@@ -120,7 +120,7 @@ class WxMessageRepository extends CommonRepository
         $data['openid'] = $message->FromUserName;
         $ch = curl_init();
         $url = env('WX_SIGNINEVENT_URL');
-        \Log::info('点击签到事件:[open_id]' . $data['open_id'] . ';发送签到接口:' . $url);
+        \Log::info('点击签到事件:[open_id]' . $data['openid'] . ';发送签到接口:' . $url);
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
