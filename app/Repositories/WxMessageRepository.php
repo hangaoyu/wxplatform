@@ -124,6 +124,7 @@ class WxMessageRepository extends CommonRepository
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         $file_contents = curl_exec($ch);
         curl_close($ch);
+        \Log::info('点击签到事件接口返回' .$file_contents);
         $res = json_decode($file_contents, true);
         if ($res['code'] == 200) {
             return $this->getReturnNews($event, $message);
