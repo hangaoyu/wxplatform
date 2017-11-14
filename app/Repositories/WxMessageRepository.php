@@ -92,15 +92,43 @@ class WxMessageRepository extends CommonRepository
         return '';
 
     }
-    public function handleClick($message){
+
+    public function handleClick($message)
+    {
         $scene_str = $message->EventKey;
         \Log::info('点击事件');
-        $event = Event::where(['scene_str'=>$scene_str,'event_type' => 'CLICK'])->first();
+        $event = Event::where(['scene_str' => $scene_str, 'event_type' => 'CLICK'])->first();
         if ($event) {
-            return $this->getReturnNews($event, $message);
+//            处理签到
+            $res = $this->handleSignInEvent($message);
+            if ($res['code'] == 200) {
+                return $this->getReturnNews($event, $message);
+            } else {
+                return $res['msg'];
+            }
         }
         $this->scanLog($message);
         return '';
+    }
+
+    public function handleSignInEvent($message)
+    {
+
+        $data['open_id'] = $message->FromUserName;
+        $ch = curl_init();
+        $url = env('WX_SIGNINEVENT_URL');
+        \Log::info('点击签到事件:[open_id]' . $data['open_id'] . ';发送签到接口:' . $url);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_POST, 1); //启用POST提交
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        $file_contents = curl_exec($ch);
+        curl_close($ch);
+        if (!$file_contents) {
+            throw new \Exception("接口调用失败");
+        }
+        return $file_contents;
     }
 
     public function getReturnNews(Event $event, $message)
@@ -113,8 +141,7 @@ class WxMessageRepository extends CommonRepository
             if ($log_count > 0) {
                 return '';
             }
-        }
-        else{
+        } else {
             $this->scanLog($message);
         }
 
@@ -207,23 +234,25 @@ class WxMessageRepository extends CommonRepository
 
     public function scanLog($message)
     {
-        $log['open_id'] = $message->FromUserName?$message->FromUserName:'';
-        $log['scene_str'] = $message->EventKey?$message->EventKey:'';
-        $log['event_type'] = $message->Event?$message->Event:'';
-        $log['scan_time'] = $message->CreateTime?date('Y-m-d H:i:s', $message->CreateTime):Carbon::now();
-        $log['month'] = date("Y-m",$message->CreateTime);
+        $log['open_id'] = $message->FromUserName ? $message->FromUserName : '';
+        $log['scene_str'] = $message->EventKey ? $message->EventKey : '';
+        $log['event_type'] = $message->Event ? $message->Event : '';
+        $log['scan_time'] = $message->CreateTime ? date('Y-m-d H:i:s', $message->CreateTime) : Carbon::now();
+        $log['month'] = date("Y-m", $message->CreateTime);
         WxScanLog::create($log);
 
     }
-    public function unsucribeScanLog($message){
-        $log['open_id'] = $message->FromUserName?$message->FromUserName:'';
-        $log['scan_time'] = $message->CreateTime?date('Y-m-d H:i:s', $message->CreateTime):Carbon::now();
-        $log['event_type'] = $message->Event?$message->Event:'';
-        $data = WxScanLog::where(['open_id' =>$log['open_id'], 'event_type' => 'subscribe'])
+
+    public function unsucribeScanLog($message)
+    {
+        $log['open_id'] = $message->FromUserName ? $message->FromUserName : '';
+        $log['scan_time'] = $message->CreateTime ? date('Y-m-d H:i:s', $message->CreateTime) : Carbon::now();
+        $log['event_type'] = $message->Event ? $message->Event : '';
+        $data = WxScanLog::where(['open_id' => $log['open_id'], 'event_type' => 'subscribe'])
             ->where('created_at', '<', $log['scan_time'])
             ->orderBy('created_at', 'DESC')->first();
         $log['scene_str'] = $data['scene_str'];
-        $log['month'] = date("Y-m",$message->CreateTime);
+        $log['month'] = date("Y-m", $message->CreateTime);
         WxScanLog::create($log);
 
     }
