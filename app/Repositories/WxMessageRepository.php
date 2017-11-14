@@ -107,7 +107,7 @@ class WxMessageRepository extends CommonRepository
             \Log::info($event['event_name']);
             if ($event['event_name'] == '签到') {
 
-                return $this->handleSignInEvent($message,$event);
+                return $this->handleSignInEvent($message, $event);
             }
             return $this->getReturnNews($event, $message);
         }
@@ -115,7 +115,7 @@ class WxMessageRepository extends CommonRepository
         return '';
     }
 
-    public function handleSignInEvent($message,$event)
+    public function handleSignInEvent($message, $event)
     {
         $data['openid'] = $message->FromUserName;
         $ch = curl_init();
@@ -128,10 +128,11 @@ class WxMessageRepository extends CommonRepository
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         $file_contents = curl_exec($ch);
         curl_close($ch);
-        if ($file_contents['code'] == 200) {
+        $res = json_decode($file_contents, true);
+        if ($res['code'] == 200) {
             return $this->getReturnNews($event, $message);
         } else {
-            return $file_contents['msg'];
+            return $res['msg'];
         }
     }
 
