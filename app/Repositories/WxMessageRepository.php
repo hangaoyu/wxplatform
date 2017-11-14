@@ -100,21 +100,18 @@ class WxMessageRepository extends CommonRepository
         $event = Event::where(['scene_str' => $scene_str, 'event_type' => 'CLICK'])->first();
         if ($event) {
 //            处理签到
-            $res = $this->handleSignInEvent($message);
-            if ($res['code'] == 200) {
-                return $this->getReturnNews($event, $message);
-            } else {
-                return $res['msg'];
+            if ($event['event_name'] == '签到') {
+                return $this->handleSignInEvent($message,$event);
             }
+            return $this->getReturnNews($event, $message);
         }
         $this->scanLog($message);
         return '';
     }
 
-    public function handleSignInEvent($message)
+    public function handleSignInEvent($message,$event)
     {
-
-        $data['open_id'] = $message->FromUserName;
+        $data['openid'] = $message->FromUserName;
         $ch = curl_init();
         $url = env('WX_SIGNINEVENT_URL');
         \Log::info('点击签到事件:[open_id]' . $data['open_id'] . ';发送签到接口:' . $url);
@@ -125,10 +122,11 @@ class WxMessageRepository extends CommonRepository
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         $file_contents = curl_exec($ch);
         curl_close($ch);
-        if (!$file_contents) {
-            throw new \Exception("接口调用失败");
+        if ($file_contents['code'] == 200) {
+            return $this->getReturnNews($event, $message);
+        } else {
+            return $file_contents['msg'];
         }
-        return $file_contents;
     }
 
     public function getReturnNews(Event $event, $message)
