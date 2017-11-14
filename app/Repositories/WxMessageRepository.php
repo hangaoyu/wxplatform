@@ -105,6 +105,7 @@ class WxMessageRepository extends CommonRepository
         if ($event) {
 //            处理签到
             if ($event['event_name'] == '签到') {
+                \Log::info('签到事件');
                 return $this->handleSignInEvent($message,$event);
             }
             return $this->getReturnNews($event, $message);
