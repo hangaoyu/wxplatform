@@ -100,8 +100,9 @@ class WxMessageRepository extends CommonRepository
         $event = Event::where(['scene_str' => $scene_str, 'event_type' => 'CLICK'])->first();
         if ($event) {
 //            处理签到
+            \Log::info($event['event_name']);
             if ($event['event_name'] == '签到') {
-                \Log::info('签到事件');
+
                 return $this->handleSignInEvent($message,$event);
             }
             return $this->getReturnNews($event, $message);
