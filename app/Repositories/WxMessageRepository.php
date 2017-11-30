@@ -118,7 +118,7 @@ class WxMessageRepository extends CommonRepository
         $userService = $wechat->user;
         $user = $userService->get($data['openid']);
         if ($user->subscribe == 0){
-            return '请先关注公众号';
+            return '还未关注，请先关注公众号';
         }
         $ch = curl_init();
         $url = env('WX_SIGNINEVENT_URL');
