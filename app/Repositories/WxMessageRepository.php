@@ -118,6 +118,12 @@ class WxMessageRepository extends CommonRepository
     public function handleSignInEvent($message, $event)
     {
         $data['openid'] = $message->FromUserName;
+        $wechat = app('wechat');
+        $userService = $wechat->user;
+        $user = $userService->get($data['openid']);
+        if ($user->subscribe == 0){
+            return '请先关注公众号';
+        }
         $ch = curl_init();
         $url = env('WX_SIGNINEVENT_URL');
         \Log::info('点击签到事件:[open_id]' . $data['openid'] . ';发送签到接口:' . $url);
