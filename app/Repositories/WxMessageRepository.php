@@ -117,6 +117,18 @@ class WxMessageRepository extends CommonRepository
 
     public function handleSignInEvent($message, $event)
     {
+        $file_contents = $this->sendSignRequest($message);
+        \Log::info('点击签到事件接口返回' . $file_contents);
+        $res = json_decode($file_contents, true);
+        if ($res['code'] == 200) {
+            return $this->getReturnNews($event, $message);
+        } else {
+            return $res['msg'];
+        }
+    }
+
+    public function sendSignRequest($message)
+    {
         $data['openid'] = $message->FromUserName;
         $ch = curl_init();
         $url = env('WX_SIGNINEVENT_URL');
@@ -128,13 +140,7 @@ class WxMessageRepository extends CommonRepository
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         $file_contents = curl_exec($ch);
         curl_close($ch);
-        \Log::info('点击签到事件接口返回' .$file_contents);
-        $res = json_decode($file_contents, true);
-        if ($res['code'] == 200) {
-            return $this->getReturnNews($event, $message);
-        } else {
-            return $res['msg'];
-        }
+        return $file_contents;
     }
 
     public function getReturnNews(Event $event, $message)
@@ -201,6 +207,14 @@ class WxMessageRepository extends CommonRepository
     {
         $user_message_name = $user_message->Content;
         $message = Message::where('message_name', $user_message_name)->first();
+        if ($user_message_name == '签到') {
+            $file_contents = $this->sendSignRequest($user_message);
+            \Log::info('点击签到事件接口返回' . $file_contents);
+            $res = json_decode($file_contents, true);
+            if ($res['code'] != 200) {
+                return $res['msg'];
+            }
+        }
         if ($message) {
             switch ($message->return_id) {
                 case 1:
