@@ -117,9 +117,7 @@ class WxMessageRepository extends CommonRepository
 
     public function handleSignInEvent($message, $event)
     {
-        $file_contents = $this->sendSignRequest($message);
-        \Log::info('点击签到事件接口返回' . $file_contents);
-        $res = json_decode($file_contents, true);
+        $res = $this->sendSignRequest($message);
         if ($res['code'] == 200) {
             return $this->getReturnNews($event, $message);
         } else {
@@ -140,7 +138,9 @@ class WxMessageRepository extends CommonRepository
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         $file_contents = curl_exec($ch);
         curl_close($ch);
-        return $file_contents;
+        \Log::info('点击签到事件接口返回' . $file_contents);
+        $res = json_decode($file_contents, true);
+        return $res;
     }
 
     public function getReturnNews(Event $event, $message)
@@ -207,10 +207,9 @@ class WxMessageRepository extends CommonRepository
     {
         $user_message_name = $user_message->Content;
         $message = Message::where('message_name', $user_message_name)->first();
+//        签到Message
         if ($user_message_name == '签到') {
-            $file_contents = $this->sendSignRequest($user_message);
-            \Log::info('点击签到事件接口返回' . $file_contents);
-            $res = json_decode($file_contents, true);
+            $res = $this->sendSignRequest($user_message);
             if ($res['code'] != 200) {
                 return $res['msg'];
             }
